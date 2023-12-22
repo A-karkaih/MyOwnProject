@@ -2,10 +2,13 @@ import React from 'react'
 import { app } from "../utils/firebaseAuth";
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { signInSuccess } from '../redux/useReducer';
 const AuthButton = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const handleGoogleAuth = async () => {
-  
+ 
       try {
           const provider = new GoogleAuthProvider();
           const auth = getAuth(app);
@@ -19,9 +22,12 @@ const AuthButton = () => {
               nom: result.user.displayName,
               email: result.user.email,
             }),
+            credentials: "include",
           });
         const data = await res.json();
+        dispatch(signInSuccess(data));
         console.log(data);
+
         navigate("/");
       } catch (error) {
             console.log("Could not sign in with google", error);

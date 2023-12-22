@@ -8,8 +8,18 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 dotenv.config();
-app.use(cors());
-
+app.use(cors(
+ {   credentials: true,
+    origin: ' http://127.0.0.1:5173',}
+));
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', ' http://127.0.0.1:5173');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+});
+const Port = process.env.PORT || 5000;
 mongoose.connect(process.env.MONGO).then(() => {   
     console.log("database connected");
 }).catch((err) => {
@@ -17,20 +27,11 @@ mongoose.connect(process.env.MONGO).then(() => {
 });
 
 
-const Port = process.env.PORT || 5000;
+
 
 app.use('/api/auth', AuthRouter);
 
-app.use((err, req, res, next) => {
-    const statusCode = err.statusCode || 500;
-    const message = err.message || "Internale Server Error";
 
-    return res.status(statusCode).json({
-        success: false,
-        statusCode,
-        message,
-    });
-});
 app.listen(Port, () => {
     console.log(`connected to port n° ${Port}`);
 });

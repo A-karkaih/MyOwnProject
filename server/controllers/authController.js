@@ -13,14 +13,15 @@ export const Login = async (req, res, next) => {
         }
         const passw = bcrypt.compareSync(password, user.password);
         if (!passw) {
-            res.status(404).json({ msg: "Wrong pass" });
+          return   res.status(404).json({ msg: "Wrong pass" });
         }
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
         const { password : pass , ...rest } = user._doc;
-        console.log(rest);
-        res.cookie("access_token", token, { httpOnly: true }).
+        res.cookie("access_token", token, { httpOnly: true, secure: true, sameSite: 'None' }).
             status(200).
             json(rest);
+        console.log(req.cookies);
+
         
     } catch (error) {
         next(error);
@@ -68,7 +69,7 @@ export const GoogleAuth = async  (req, res, next) => {
     if (user) {
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
         const { password: pass, ...rest } = user._doc;
-        res.cookie("access_token", token, { httpOnly: true }).
+        res.cookie("access_token", token, { httpOnly: true, secure: true, sameSite: 'None' }).
             status(200).
             json(rest);
     } else {
@@ -82,7 +83,11 @@ export const GoogleAuth = async  (req, res, next) => {
         });
         try {
             await newUser.save();
-
+            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+            const { password: pass, ...rest } = user._doc;
+            res.cookie("access_token", token, { httpOnly: true, secure: true, sameSite: 'None' }).
+                status(200).
+                json(rest);
         } catch (error) {
             next(error);
             res.status(201).json(user);

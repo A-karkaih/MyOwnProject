@@ -1,29 +1,38 @@
 import AuthButton from '../components/AuthButton';
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from 'react-redux';
+import { signInSuccess  } from '../redux/useReducer';
 
 const Login = () => {
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData.password);
-     console.log(formData.email);
+    console.log(formData.email);
     try {
      const res = await fetch("http://localhost:3001/api/auth/login", {
        method: "POST",
        headers: { "Content-Type": "application/json" },
        body: JSON.stringify(formData),
+       credentials: "include",
      });
       const data = await res.json();
    
      console.log(data);
-     if (data.msg) {
-       alert(data.msg);
-     } else {
+      if (data.msg) {
+       
+        alert(data.msg);
+        return;
+
+      }
+      dispatch(signInSuccess(data));
        navigate("/");
-     }
+     
     
 
     } catch (error) {

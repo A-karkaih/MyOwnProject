@@ -1,13 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Heart from "react-animated-heart";
 import { CiSquarePlus } from "react-icons/ci";
 import { FaSearch } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-
+import { signOutSuccess } from "../redux/useReducer";
 const NavBar = () => {
   const [isClick, setClick] = useState(false);
-    const [foormData, setfoormData] = useState();
+ const {currentUser }= useSelector((state) => state.user);
+ console.log(currentUser);
+  const dispatch = useDispatch();
 
+  const logout = () => {
+    document.cookie =
+      "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    dispatch(signOutSuccess());
+  }
+
+  
     return (
       <header className="h-16 w-full flex items-center justify-between px-8  bg-nav-color  shadow-md">
         <div className="flex items-center ">
@@ -39,10 +49,17 @@ const NavBar = () => {
             <CiSquarePlus className="text-nav-text" />
             <h1 className="text-nav-text"> Ajouter </h1>
           </button>
+
           <Link to={"/login"}>
-            <button className="flex items-center bg-graynav  px-3 py-1 rounded-full   ">
-              <h1 className="text-nav-text"> Login </h1>
-            </button>
+            {currentUser ? (
+              <button  onClick={logout} className="flex items-center bg-graynav  px-3 py-1 rounded-full   ">
+                <h1 className="text-nav-text">LogOut</h1>
+              </button>
+            ) : (
+              <button className="flex items-center bg-graynav  px-3 py-1 rounded-full   ">
+                <h1 className="text-nav-text">LogIn</h1>
+              </button>
+            )}
           </Link>
         </div>
       </header>
